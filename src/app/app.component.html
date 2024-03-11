@@ -1,21 +1,26 @@
 <div class="header mt-4">
-  <h1>Cotação do Dólar - {{cotacaoAtual}}</h1>
+  <h1>Cotação do Dólar - {{cotacaoAtual.preco.toPrecision(4)}}</h1>
 </div>
 
 <div class="buscarPorPeriodo">
   Histórico de cotações
   <label class="mr-3" for="dataInicial">Data inicial:</label>
-  <input id="dataInicial" type="date" name="dataInicial" #dataInicial>
+  <input id="dataInicial" type="date" required name="dataInicial" #dataInicial value="2024-02-01">
   <label class="mr-3" for="dataFinal">Data final:</label>
-  <input id="dataFinal" type="date" name="dataFinal" #dataFinal>
+  <input id="dataFinal" type="date" required name="dataFinal" #dataFinal value="2024-03-10">
   <button mat-raised-button color="primary" type="submit" class="btnPesquisar" (click)="getCotacaoPorPeriodo(dataInicial.value, dataFinal.value)" > Pesquisar </button>
+  <button mat-raised-button color="primary" type="submit" class="btnPesquisar" (click)="getCotacaoMenorPorPeriodoFront(dataInicial.value, dataFinal.value)" > Pesquisar Menores Cortações </button>
 </div>
 
 <div class="mt-3">
+  <header class="header">
+    <h2 *ngIf="cotacaoPorPeriodoLista.length">Lista Histórico de Cotações</h2>
+  </header>
   <ul *ngFor="let item of cotacaoPorPeriodoLista">
     <li class="listaHistoricoCotacoesItem">
       <span class="historicoDeCotacoesItemInfo"> {{item.data}}-{{item.hora}}  </span>
-      <span class="historicoDeCotacoesItemInfo"> {{item.preco}} </span>
+      <span class="historicoDeCotacoesItemInfo"> {{item.preco.toPrecision(4)}} </span>
+      <span class="historicoDeCotacoesItemInfo"> {{(item.preco-cotacaoAtual.preco).toPrecision(4)}} </span>
     </li>
   </ul>
 </div>
