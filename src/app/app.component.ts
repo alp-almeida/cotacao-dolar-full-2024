@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Cotacao } from './cotacao';
 import { CotacaoDolarService } from './cotacaodolar.service';
 
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -14,67 +15,62 @@ export class AppComponent implements OnInit {
   
   public dataInicial: Date | undefined;
   public dataFinal = new Date().toLocaleDateString();
-  // dataFinal: Date = new Date();
 
-  constructor( private cotacaoDolarService: CotacaoDolarService, private dateFormat: DatePipe) {
+  constructor( private cotacaoDolarService: CotacaoDolarService, private dateFormat: DatePipe) {}
+
+  public formatDate(strDate: string|Date) :String {
+    if(typeof(strDate) =='string'){
+      var output = this.dateFormat.transform(Date.parse(strDate), "dd/MMM/yyyy") || ''
+      if(output.length == 0){
+        output = this.dateFormat.transform(Date.parse(strDate), "MM/dd/yyyy") || ''
+      }
+      return output
+    } else {
+      return strDate.toLocaleString();
+    }
     
   }
 
-  public getDataAtual(){
-    return new Date();
+
+  public getValidacaoPreenchimento(dataInicial:string, dataFinal:string) :boolean{
+    const dtnow = Date.now();
+
+     if (!dataInicial && !dataFinal) {
+      //ALERTA DE ERRO POÍS DATA INICIAL E FINAL SÃO OBRIGATÓRIAS
+      window.alert('Data inicial e data final são obrigatórias')
+      return false;
+    } else if( dtnow<Date.parse(dataInicial) || dtnow < Date.parse(dataFinal)){
+      window.alert('Nenhuma das datas pode ser maior que a data atual.')
+      return false;
+    }else if(dataInicial > dataFinal){
+      window.alert('Data inicial deve ser menor que a data final')
+      return false;
+    } else {
+      return true;
+    }
   }
 
-
-  public formatDate(strDate: string) :String {
-    
-    return Date.parse(strDate).toLocaleString();
-  }
 
 
   public getCotacaoPorPeriodo(dataInicialString: string,dataFinalString: string): void {
-    
     this.cotacaoPorPeriodoLista = [];
     const dataInicial = this.dateFormat.transform(dataInicialString, "MM-dd-yyyy") || '';
     const dataFinal = this.dateFormat.transform(dataFinalString, "MM-dd-yyyy") || '';
-
-    const dtnow = Date.now();
-
-     if (dataInicial && dataFinal) {
-      if( dtnow<Date.parse(dataInicial) || dtnow < Date.parse(dataFinal)){
-        window.alert('Nenhuma das datas pode ser maior que a data atual.')
-      }else if(dataInicial > dataFinal){
-        window.alert('Data inicial deve ser menor que a data final')
-      } else{
-        this.cotacaoDolarService.getCotacaoPorPeriodoFront(dataInicial, dataFinal)
+    if(this.getValidacaoPreenchimento(dataInicial,dataFinal)){
+      this.cotacaoDolarService.getCotacaoPorPeriodoFront(dataInicial, dataFinal)
             .subscribe(cotacoes => { this.cotacaoPorPeriodoLista = cotacoes;})
-      }
-    } else {
-      //ALERTA DE ERRO POÍS DATA INICIAL E FINAL SÃO OBRIGATÓRIAS
-      window.alert('Data inicial e data final são obrigatórias')
     }
   }
 
 
   public getCotacaoMenorPorPeriodoFront(dataInicialString: string,dataFinalString: string): void {
-    
     this.cotacaoPorPeriodoLista = [];
+    console.log(dataInicialString,dataFinalString)
     const dataInicial = this.dateFormat.transform(dataInicialString, "MM-dd-yyyy") || '';
     const dataFinal = this.dateFormat.transform(dataFinalString, "MM-dd-yyyy") || '';
-
-    const dtnow = Date.now();
-
-     if (dataInicial && dataFinal) {
-      if( dtnow<Date.parse(dataInicial) || dtnow < Date.parse(dataFinal)){
-        window.alert('Nenhuma das datas pode ser maior que a data atual.')
-      }else if(dataInicial > dataFinal){
-        window.alert('Data inicial deve ser menor que a data final')
-      } else{
-        this.cotacaoDolarService.getCotacaoMenorPorPeriodoFront(dataInicial, dataFinal)
+    if(this.getValidacaoPreenchimento(dataInicial,dataFinal)){
+      this.cotacaoDolarService.getCotacaoMenorPorPeriodoFront(dataInicial, dataFinal)
             .subscribe(cotacoes => { this.cotacaoPorPeriodoLista = cotacoes;})
-      }
-    } else {
-      //ALERTA DE ERRO POÍS DATA INICIAL E FINAL SÃO OBRIGATÓRIAS
-      window.alert('Data inicial e data final são obrigatórias')
     }
   }
 
@@ -82,4 +78,5 @@ export class AppComponent implements OnInit {
     this.cotacaoDolarService.getCotacaoAtual()
     .subscribe(cotacao => {this.cotacaoAtual = cotacao;})
   }
+  
 }

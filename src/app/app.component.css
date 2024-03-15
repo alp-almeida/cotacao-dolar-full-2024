@@ -39,13 +39,14 @@ ul {
 
 li {
     background-color: beige;
-    margin-bottom: 5px;
+    margin-bottom: 0px;
     padding: 5px;
     border-radius: 25px;
+    text-align: center;
 }
 
 li span {
-    font-size: 20px;
+    font-size: 15px;
     margin-right: 10%;
     margin-left: 5%;
 }
